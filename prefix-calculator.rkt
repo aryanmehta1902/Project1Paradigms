@@ -52,7 +52,7 @@
            (cons #f (cdr chars))))]
     
     ; Division operator (integer division)
-    [(and (not (null? chars)) (char=? (car chars) #\/))
+    [(and (not (null? chars)) (char=? (car(chars) ) #\/))
      (let* ([first-eval (evaluate-expression (cdr chars) history)]
             [first-val (car first-eval)]
             [rest-chars (cdr first-eval)])
@@ -78,5 +78,34 @@
            (cons (- val) remaining)
            (cons #f (cdr chars))))]
     
+    ; History lookup operator
+    [(and (not (null? chars)) (char=? (car chars) #\$))
+     (let* ([id-chars (get-number (cdr chars))]
+            [id-str (list->string (car id-chars))]
+            [remaining (cdr id-chars)])
+       (if (string=? id-str "")
+           (cons #f chars)
+           (let ([id (string->number id-str)])
+             (if (and id (> id 0) (<= id (length history)))
+                 (cons (list-ref (reverse history) (- id 1)) remaining)
+                 (cons #f chars)))))]
+    
+    ; Number literal
+    [(and (not (null? chars))
+           (or (char-numeric? (car chars)) (char=? (car chars) #\.)))
+     (let* ([num-chars (get-number chars)]
+            [num-str (list->string (car num-chars))]
+            [remaining (cdr num-chars)])
+       (cons (string->number num-str) remaining))]
+    
     ; Fallback error clause for unrecognized expressions
     [else (cons #f chars)]))
+
+(define (get-number chars)
+  (define (collect-digits acc remaining)
+    (cond
+      [(null? remaining) (cons (reverse acc) '())]
+      [(or (char-numeric? (car remaining)) (char=? (car remaining) #\.))
+       (collect-digits (cons (car remaining) acc) (cdr remaining))]
+      [else (cons (reverse acc) remaining)]))
+  (collect-digits '() chars))
