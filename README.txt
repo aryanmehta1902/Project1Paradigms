@@ -6,7 +6,7 @@ This project implements a prefix-notation expression calculator using Racket. Th
 
 Files:
 - project1.rkt: Main source file containing calculator implementation.
-- devlog.md: Development log documenting your progress and session notes.
+- devlog.md: Development log documenting progress and session notes.
 - README.txt: This file, which explains project and how to run it.
 
 How to Run:
